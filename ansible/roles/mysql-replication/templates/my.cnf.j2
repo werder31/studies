@@ -1,0 +1,37 @@
+[mysqld]
+port = {{ mysql_port }}
+bind-address = {{ ansible_default_ipv4.address }}
+datadir = {{ mysql_datadir }}
+socket = {{ mysql_socket }}
+skip-name-resolve
+
+# Replication
+server-id = {{ mysql_server_id }}
+
+{% if mysql_replication_role == 'master' %}
+log_bin = mysql-bin
+log-bin-index = mysql-bin.index
+expire_logs_days = {{ mysql_expire_logs_days }}
+max_binlog_size = {{ mysql_max_binlog_size }}
+binlog_format = {{mysql_binlog_format}}
+
+{% for db in mysql_databases %}
+{% if db.replicate|default(yes) %}
+binlog_do_db = {{ db.name }}
+{% else %}
+binlog_ignore_db = {{ db.name }}
+{% endif %}
+{% endfor %}
+	
+{% if mysql_replication_role == 'slave' %}
+read_only
+relay-log = relay-bin
+relay-log-index = relay-bin.index
+{% endif %}
+{% endif %}
+
+symbolic-links = 0
+user = mysql
+
+[mysqldump]
+quick

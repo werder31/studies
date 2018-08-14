@@ -1,0 +1,29 @@
+---
+- name: Create global My.cnf
+  template:
+    src: "my.cnf.j2"
+    dest: "/etc/my.cnf"
+    owner: root
+    group: root
+    mode: 0600
+    force: yes
+  notify: restart mysqld daemon
+  tags: Made My.cnf
+
+- name: Ensure MySQL databases are present.
+  mysql_db:
+    name: "{{ item.name }}"
+    collation: "{{ item.collation }}"
+    encoding: "{{ item.encoding }}"
+    state: present
+  with_items: "{{ mysql_databases }}"
+  when: mysql_databases is defined
+
+- name: Create mysql users
+  mysql_user:
+    name: "{{ item.name }}"
+    host: "{{ item.host }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv }}"
+  with_items: "{{ mysql_users }}"
+  when: mysql_users is defined

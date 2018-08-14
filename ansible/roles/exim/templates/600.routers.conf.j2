@@ -1,0 +1,37 @@
+dnslookup:
+  driver = dnslookup
+  domains = ! +local_domains
+  transport = remote_smtp
+  ignore_target_hosts = 0.0.0.0 : 127.0.0.0/8
+  no_more
+
+system_aliases:
+    driver      = redirect
+    allow_fail
+    allow_defer
+    data = ${lookup mysql{SELECT `goto` FROM `alias` WHERE `address`='${quote_mysql:$local_part@$domain}' OR `address`='${quote_mysql:@$domain}'}}
+
+domain_aliases:
+  driver        = redirect
+  domains       = ${lookup mysql{SELECT `alias_domain` FROM `alias_domain` WHERE \
+                  `alias_domain`='${quote_mysql:$domain}' AND `active` ='1'}}
+  data          = ${quote:$local_part}@${lookup mysql{SELECT `target_domain` FROM \
+                  `alias_domain` WHERE `alias_domain`='${quote_mysql:$domain}'}}
+  no_more
+
+#maildir_spam:
+# driver = accept
+# local_parts = !www:!root:!nobody:!postmaster:!abuse:!admin
+# transport = mysql_delivery
+# condition = ${if def:h_X-Spam-Score: {true}}
+
+backup_incommnig:
+  driver = accept
+  condition = ${if eq{}{${lookup mysql{SELECT `maildir` FROM `mailbox` WHERE `username`='${quote_mysql:$local_part@$domain}' AND `active` ='1'}}}{no}{yes}}
+  transport = local_copy_incomming
+  unseen
+
+mysql_user:
+  driver = accept
+  condition = ${if eq{}{${lookup mysql{SELECT `maildir` FROM `mailbox` WHERE `username`='${quote_mysql:$local_part@$domain}'  AND `active` ='1'}}}{no}{yes}}
+  transport = mysql_delivery

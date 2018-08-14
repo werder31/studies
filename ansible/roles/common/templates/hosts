@@ -1,0 +1,15 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+{% if 'prod' in inventory_hostname %}
+{{ prod_nginx }}        prod_nginx prod.local
+{{ prod_apache01 }}     prod_apache01
+{{ prod_apache02 }}     prod_apache02
+{{ prod_db01 }}         prod_db01
+{{ prod_db02 }}         prod_db02
+{% else %}
+{{ test_nginx }}        test_nginx test.local
+{{ test_apache01 }}     test_apache01
+{{ test_apache02 }}     test_apache02
+{{ test_db01 }}         test_db01
+{{ test_db02 }}         test_db02
+{% endif %}

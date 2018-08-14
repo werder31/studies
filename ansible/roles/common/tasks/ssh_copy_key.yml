@@ -1,0 +1,17 @@
+---
+- name: Create .ssh dir on remote servers
+  file:
+    path: "~/.ssh/"
+    state: directory
+    mode: 0700
+  tags: basic-tasks
+
+- name: Copy id_rsa.pub to remote servers
+  copy:
+    src: "~/.ssh/id_rsa.pub"
+    dest: "~/.ssh/authorized_keys"
+    owner: root
+    group: root
+    mode: 0600
+  tags: basic-tasks
+

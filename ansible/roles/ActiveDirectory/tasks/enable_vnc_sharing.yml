@@ -1,0 +1,17 @@
+---
+- name: Disable VNC encr
+  copy:
+    src: vino-fix.sh
+    dest: "/home/vino-fix.sh"
+    mode: "u+rwx,g+rx,o+rx"
+    owner: root
+    group: root
+
+- name: Disable VNC encr
+  copy:
+    src: vino-vnc.desktop
+    dest: "/etc/xdg/autostart/vino-vnc.desktop"
+    mode: "u+rw,g+r,o+r"
+    owner: root
+    group: root
+

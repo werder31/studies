@@ -1,0 +1,16 @@
+---
+- hosts: webprod dbprod
+  roles:
+  - common
+
+- hosts: nginxprod
+  roles:
+  - nginx-front
+
+- hosts: apacheprod
+  roles:
+  - apache-back
+
+- hosts: dbprod
+  roles:
+  - mysql

@@ -1,0 +1,17 @@
+---
+- name: Disable Guest login
+  copy:
+    src: 50-no-guest.conf
+    dest: /etc/lightdm/lightdm.conf.d/50-no-guest.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enable DC auth
+  lineinfile:
+    path: /etc/pam.d/common-session
+    line: "session  optional  pam_mkhomedir.so skel=/etc/skel/ umask=0077"
+    owner: root
+    group: root
+    mode: 0644
+  tags: Enable DC auth

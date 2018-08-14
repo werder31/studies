@@ -1,0 +1,12 @@
+prod_nginx: 10.0.0.11
+prod_apache01: 10.0.0.12
+prod_apache02: 10.0.0.13
+prod_db01: 10.0.0.15
+prod_db02: 10.0.0.16
+
+test_nginx: 10.0.0.111
+test_apache01: 10.0.0.112
+test_apache02: 10.0.0.113
+test_db01: 10.0.0.115
+test_db02: 10.0.0.116
+

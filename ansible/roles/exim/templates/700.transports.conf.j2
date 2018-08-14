@@ -1,0 +1,66 @@
+remote_smtp:
+    headers_remove = Received
+    driver = smtp
+#    dkim_domain           = DKIM_DOMAIN
+#    dkim_selector         = default
+#    dkim_private_key      = DKIM_PRIVATE_KEY
+    transport_filter = /bin/sh -c '${if exists{/etc/exim/signature/mails/$sender_address.txt}\
+                                  {/usr/bin/altermime --input=- --disclaimer=/etc/exim/signature/mails/$sender_address.txt --disclaimer-html=/etc/exim/signature/mails/$sender_address.html}\
+                                  {${if exists{/etc/exim/signature/domains/$sender_address_domain.txt}\
+                                  {/usr/bin/altermime --input=- --disclaimer=/etc/exim/signature/domains/$sender_address_domain.txt --disclaimer-html=/etc/exim/signature/mails/$sender_address_domain.html}\
+                                  {/bin/cat}}}}'
+mysql_delivery:
+    driver = appendfile
+    transport_filter = /bin/sh -c '${if exists{/etc/exim/signature/mails/$sender_address.txt}\
+                                  {/usr/bin/altermime --input=- --disclaimer=/etc/exim/signature/mails/$sender_address.txt --disclaimer-html=/etc/exim/signature/mails/$sender_address.html}\
+                                  {${if exists{/etc/exim/signature/domains/$sender_address_domain.txt}\
+                                  {/usr/bin/altermime --input=- --disclaimer=/etc/exim/signature/domains/$sender_address_domain.txt --disclaimer-html=/etc/exim/signature/mails/$sender_address_domain.html}\
+                                  {/bin/cat}}}}'
+    check_string = ""
+    create_directory
+    delivery_date_add
+    directory = ${lookup mysql{SELECT CONCAT('{{ mail_path }}', `maildir`) FROM `mailbox` WHERE `username`='${local_part}@${domain}'}}
+    directory_mode = 770
+    envelope_to_add
+    group = mail
+    maildir_format
+    maildir_tag = ,S=$message_size
+    message_prefix = ""
+    message_suffix = ""
+    mode = 0770
+
+
+local_copy_incomming:
+    driver = appendfile
+    create_directory
+    delivery_date_add
+    directory = {{ mail_archive_path}}${domain}/${local_part}/input/
+    directory_mode = 770
+    envelope_to_add
+    group = mail
+    maildir_format
+    mode = 0770
+
+local_copy_outgoin:
+    driver = appendfile
+    delivery_date_add
+    envelope_to_add
+    return_path_add
+    group = mail
+    user = exim
+    mode = 0770
+    maildir_format = true
+    create_directory = true
+
+address_file:
+    driver = appendfile
+    delivery_date_add           
+    envelope_to_add
+    return_path_add
+
+address_pipe:
+  driver = pipe
+  return_output
+  
+address_reply:
+  driver = autoreply

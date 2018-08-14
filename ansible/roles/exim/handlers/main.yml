@@ -1,0 +1,25 @@
+---
+- name: restart exim daemon
+  service:
+    name=exim
+    state=restarted
+
+- name: Import exim database structure
+  copy:
+    src: "{{ exim_db }}.sql"
+    dest: /tmp
+  notify:
+    - Restore database
+
+- name: Restore database
+  mysql_db:
+    name: "{{ exim_db }}"
+    state: import
+    target: "/tmp/{{ exim_db }}.sql"
+
+- name: Stop and disable Postfix
+  service:
+    name: postfix
+    state: stopped
+    enabled: no
+  tags: install and start exim

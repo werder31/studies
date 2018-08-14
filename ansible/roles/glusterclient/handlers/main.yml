@@ -1,0 +1,14 @@
+---
+- name:  Create a ext4 filesystem
+  filesystem:
+    fstype: ext4
+    dev: "/dev/{{ item.item.key }}1"
+  with_items: "{{free_disk.results}}"
+  when: item.changed == true
+
+- name: mount new disk
+  command: /bin/mount "/dev/{{ item.item.key }}1" "{{ mount_path }}"
+  with_items: "{{free_disk.results}}"
+  when: item.changed == true
+
+

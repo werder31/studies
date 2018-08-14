@@ -1,0 +1,21 @@
+- name: Install exim server
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - exim
+    - exim-mysql
+    - altermime
+  tags: install and start exim
+
+- name: Enable and start exim server
+  service:
+    name: exim
+    state: started
+    enabled: yes
+  tags: install and start exim
+  notify: Stop and disable Postfix
+
+- name: Change alternativ MTA to Exim
+  command: alternatives --set mta /usr/sbin/sendmail.exim
+  tags: install and start exim

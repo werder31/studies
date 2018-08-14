@@ -1,0 +1,4 @@
+---
+- hosts: ubuntu-desktop
+  roles:
+  - ActiveDirectory

@@ -1,0 +1,28 @@
+---
+- name: Add GlusterFS repository
+  yum_repository:
+    name: Glusterfs
+    description: CentOS-$releasever - Gluster 3.10
+    baseurl: http://mirror.centos.org/centos/$releasever/storage/$basearch/gluster-3.10
+    enabled: yes
+    gpgcheck: no
+  tags: Install and start GlusterServer
+
+- name: Install GlusterFS Server
+  yum:
+    name: glusterfs-server
+    state: latest
+  tags: Install and start GlusterServer
+
+- name: Enables and start GlsuterFS daemon
+  service:
+    name: glusterd
+    state: started
+    enabled: yes
+  tags: Install and start GlusterServer
+
+- name: Install parted
+  yum:
+    name: parted
+    state: latest    
+  tags: Install and start GlusterServer

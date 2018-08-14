@@ -1,0 +1,20 @@
+deny    message = "Message rejected: virus found $malware_name. I don't need virus :-) "
+        hosts = *
+        malware = *
+
+#        accept  condition = ${if >={$message_size}{1200k}{yes}{no}}
+#        warn    message = X-SA-Score: $spam_score 
+#                spam = spamd:true 
+#        warn    message = X-SA-Report: $spam_report 
+#                spam = spamd:true
+#                condition = ${if >{$spam_score_int}{0}{true}{false}}
+#        warn    message = X-SA-Status: Yes 
+#                spam = spamd:true
+#                condition = ${if >{$spam_score_int}{50}{true}{false}}
+#	 warn	message = Subject: ***SPAM*** $h_Subject:
+#                spam = spamd:true
+#	        !senders = +whitelist_domain
+#                condition = ${if >{$spam_score_int}{50}{true}{false}}
+
+
+accept

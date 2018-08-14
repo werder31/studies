@@ -1,0 +1,12 @@
+if $sender_address_domain is "{{ primary_mail_domain }}"
+then
+	unseen save {{ mail_archive_path }}$sender_address_domain/$sender_address_local_part/output/
+endif
+
+{% for domain in secondary_mail_domain %}
+if $sender_address_domain is "{{ domain.name }}"
+then
+        unseen save {{ mail_archive_path }}$sender_address_domain/$sender_address_local_part/output/
+endif
+{% endfor %}
+

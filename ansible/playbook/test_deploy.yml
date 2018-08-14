@@ -1,0 +1,16 @@
+---
+- hosts: webtest dbtest
+  roles:
+  - common
+
+- hosts: nginxtest
+  roles:
+  - nginx-front
+
+- hosts: apachetest
+  roles:
+  - apache-back
+
+- hosts: dbtest
+  roles:
+  - mysql

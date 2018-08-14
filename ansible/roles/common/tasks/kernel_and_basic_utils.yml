@@ -1,0 +1,33 @@
+---
+- name: Install Epel release
+  yum:
+    name: epel-release
+    state: latest
+  tags: basic-tasks
+
+
+- name: Update sytem kernel and packages
+  yum:
+    name: '*'
+    state: latest
+  tags: basic-tasks
+
+- name: Copy executable script for build RAR
+  copy:
+    src: build_rar.sh
+    dest: /tmp/build_rar.sh
+    owner: root
+    group: root
+    mode: "o+rw,g+x"
+  tags: basic-tasks
+  notify: Build RAR
+
+- name: Install basic utils
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+   - "{{ basic_utils }}"
+  tags: basic-tasks
+  notify: server reboot
+

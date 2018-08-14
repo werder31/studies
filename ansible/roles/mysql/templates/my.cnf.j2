@@ -1,0 +1,12 @@
+[mysqld]
+port = {{ mysql_port }}
+bind-address = {{ ansible_default_ipv4.address }}
+datadir = {{ mysql_datadir }}
+socket = {{ mysql_socket }}
+skip-name-resolve
+
+symbolic-links = 0
+user = mysql
+
+[mysqldump]
+quick

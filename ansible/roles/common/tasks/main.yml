@@ -1,0 +1,8 @@
+---
+- include: disable_selinux.yml
+- include: disable_iptables.yml
+- include: ssh_copy_key.yml
+#- include: copy_hosts_file.yml
+#- include: change_profile.yml
+- include: kernel_and_basic_utils.yml
+- include: ssl_generate.yml

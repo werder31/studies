@@ -1,0 +1,23 @@
+---
+- name: Create folder email location
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: exim
+    group: mail
+  with_items:
+    - "{{ mail_path }}"
+    - "{{ mail_archive_path }}"
+  tags: Exim configuration
+
+- name: Create folder structure
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /etc/exim/acllist/
+    - /etc/exim/DKIM/
+    - /etc/exim/signature/
+    - /etc/exim/signature/domains/
+    - /etc/exim/signature/mails/
+  tags: Exim configuration

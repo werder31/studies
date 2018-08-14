@@ -1,0 +1,91 @@
+---
+- name: Create global My.cnf
+  template:
+    src: "my.cnf.j2"
+    dest: "/etc/my.cnf"
+    owner: root
+    group: root
+    mode: 0600
+    force: yes
+  notify: restart mysqld daemon
+  tags: Made My.cnf
+
+- name: Ensure MySQL databases are present.
+  mysql_db:
+    name: "{{ item.name }}"
+    collation: "{{ item.collation }}"
+    encoding: "{{ item.encoding }}"
+    state: present
+  with_items: "{{ mysql_databases }}"
+
+- name: Create mysql users
+  mysql_user:
+    name: "{{ item.name }}"
+    host: "{{ item.host }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv }}"
+  with_items: "{{ mysql_users }}"
+  when: mysql_users is defined
+
+- name: Ensure replication user exists on master.
+  mysql_user:
+    name: "{{ item.name }}"
+    host: "{{ item.host }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv }}"
+    state: present
+  when: >
+    (mysql_replication_role == 'master')
+  with_items: 
+    - "{{ mysql_replication_user }}"
+  notify: restart mysqld daemon
+  tags: make replication
+
+- name: Check slave replication status.
+  mysql_replication:
+    mode: getslave
+  ignore_errors: true
+  register: slave
+  when: >
+    mysql_replication_role == 'slave'
+    and (mysql_replication_master != '')
+  tags: make replication
+
+- name: Restart Mysql and wait Master
+  service:
+    name: mysqld
+    state: restarted
+  tags: make replication
+
+- name: Get File and Position from Master server 
+  mysql_replication: 
+    mode=getmaster
+  delegate_to: "{{ mysql_replication_master }}"
+  register: master
+  when: ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
+        and (mysql_replication_role == 'slave')
+        and (mysql_replication_master != '')
+  tags: make replication
+
+- name: Configure replication on the slave.
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{ mysql_replication_master }}"
+    master_user: "{{ item.name }}"
+    master_password: "{{ item.password }}"
+    master_log_file: "{{ master.File }}"
+    master_log_pos: "{{ master.Position }}"
+  with_items: "{{ mysql_replication_user }}"
+  ignore_errors: True
+  when: ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
+        and (mysql_replication_role == 'slave')
+        and (mysql_replication_master != '')
+        and mysql_replication_user
+  tags: make replication
+
+- name: Start replication.
+  mysql_replication: mode=startslave
+  when: ((slave.Is_Slave is defined and not slave.Is_Slave) or (slave.Is_Slave is not defined and slave|failed))
+        and (mysql_replication_role == 'slave')
+        and (mysql_replication_master != '')
+  tags: make replication

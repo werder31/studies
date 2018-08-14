@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/vino-fix.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=Dis enc
+Name=Dis enc
+Comment[en_US]=
+Comment=
+

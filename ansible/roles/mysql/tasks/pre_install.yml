@@ -1,0 +1,31 @@
+---
+- name: Add repositories mysql-connectors-community
+  yum_repository:
+    name: mysql-connectors-community
+    description: mysql-connectors-community
+    file: external_repos
+    baseurl: http://repo.mysql.com/yum/mysql-connectors-community/el/6/$basearch/
+    enabled: yes
+    gpgcheck: no
+  tags: Enable mysql repo
+
+- name: Add repositories mysql-tools-community
+  yum_repository:
+    name: mysql-tools-community
+    description: mysql-tools-community
+    file: external_repos
+    baseurl: http://repo.mysql.com/yum/mysql-tools-community/el/6/$basearch/
+    enabled: yes
+    gpgcheck: no
+  tags: Enable mysql repo
+
+- name: Add repositories mysql56-community
+  yum_repository:
+    name: MySQL-Community-Server
+    description: MySQL 5.6 Community Server
+    file: external_repos
+    baseurl: http://repo.mysql.com/yum/mysql-5.6-community/el/6/$basearch/
+    enabled: yes
+    gpgcheck: no
+  tags: Enable mysql repo
+

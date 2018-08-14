@@ -1,0 +1,50 @@
+# Databases.
+mysql_databases:
+   - name: proddb
+     collation: utf8_general_ci
+     encoding: utf8
+     replicate: yes
+
+mysql_users:
+ - name: ecommerce-1
+   password: "pa$$wd1"
+   host: "%"
+   priv: "proddb.*:ALL"
+
+ - name: ecommerce-2
+   password: "pa$$wd2"
+   host: "%"
+   priv: "proddb.*:ALL"
+
+ - name: ecommerce-3
+   password: "pa$$wd3"
+   host: "%"
+   priv: "proddb.*:ALL"
+
+ - name: ecommerce-4
+   password: "pa$$wd4"
+   host: "%"
+   priv: "proddb.*:ALL"
+
+ - name: ecommerce-5
+   password: "pa$$wd5"
+   host: "%"
+   priv: "proddb.*:ALL"
+
+mysql_replication_user:
+   - name: replicauser
+     host: "%"
+     password: 3m0Mn5c9H8ZA36C
+     priv: "*.*:REPLICATION SLAVE,REPLICATION CLIENT"
+
+mysql_root_password:    "Iwi11NeV3RevEeU$3defaultPA$$WORDS"
+
+mysql_replication_master: prod_db01
+
+mysql_max_binlog_size: "100M"
+mysql_binlog_format: "ROW"
+mysql_expire_logs_days: "10"
+
+mysql_port:		3306
+mysql_datadir:		/var/lib/mysql
+mysql_socket:		/var/lib/mysql/mysql.sock

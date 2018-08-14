@@ -1,0 +1,7 @@
+---
+- include: install.yml
+- include: configure.yml
+- include: en_dc_auth.yml
+- include: enable_vnc_sharing.yml
+- include: add_pc_dc.yml
+

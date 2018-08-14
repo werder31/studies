@@ -1,0 +1,14 @@
+---
+- name: Install mysql server
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ mysql_packages }}"
+  tags: install and start MySql
+
+- name: Enable and start mysql server
+  service:
+    name: mysqld
+    state: started
+    enabled: yes
+  tags: install and start MySql

@@ -1,0 +1,5 @@
+- hosts: storage-grp
+  roles:
+#  - common
+  - glusterfs
+  serial: "100%"

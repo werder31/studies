@@ -1,0 +1,12 @@
+---
+- name: Change Hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - "192.168.35.100 gfs1 gfs1.domain.local"
+    - "192.168.35.101 gfs2 gfs2.domain.local"
+    - "192.168.35.102 gfscl gfscl.domain.local"

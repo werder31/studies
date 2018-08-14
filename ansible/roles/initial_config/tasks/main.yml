@@ -1,0 +1,16 @@
+---
+# tasks file for initial_config
+
+- name: install packages for Centos
+  yum:
+    name:
+      - open-vm-tool
+      - vim
+      - epel-release
+      - hyperv-daemons
+      - git
+      - bash-completion
+      - python-pip
+      - mlocate
+    state: latest
+

@@ -1,0 +1,5 @@
+---
+- include: install.yml
+- include: ssl_cert.yml
+- include: virtualhost_configure.yml
+

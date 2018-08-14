@@ -1,0 +1,86 @@
+local_interfaces = 127.0.0.1.25 : {{ ansible_default_ipv4.address }}.25 : {{ ansible_default_ipv4.address }}.465
+primary_hostname = {{ ansible_fqdn }}
+hide mysql_servers = localhost/{{ exim_db }}/{{ exim_user }}/{{ exim_password }}
+
+domainlist local_domains = ${lookup mysql{SELECT `domain` \
+                            FROM `domain` WHERE \
+                            `domain`='${domain}' AND \
+                            `active`='1'}}
+domainlist relay_to_domains = ${lookup mysql{SELECT `domain` \
+                            FROM `domain` WHERE \
+                            `domain`='${domain}' AND \
+                            `active`='1'}}
+hostlist   relay_from_hosts = net-iplsearch;/etc/exim/acllist/relay_from_hosts
+hostlist   whitelist_sender = /etc/exim/acllist/whitelist_sender
+addresslist whitelist_domain = /etc/exim/acllist/whitelist_domain
+hostlist bad_senders = /etc/exim/acllist/spamersip
+addresslist senderbadlist = /etc/exim/acllist/spamersdomain
+
+
+acl_smtp_rcpt = acl_check_rcpt
+acl_smtp_data = acl_check_data
+acl_smtp_mime = acl_check_mime
+
+
+av_scanner = clamd:/var/run/clamav/clamd.sock
+#spamd_address = 127.0.0.1 783
+
+#queue_only = true
+
+log_file_path = /var/log/exim/%s.log
+write_rejectlog = no
+qualify_domain = {{ primary_mail_domain }}
+qualify_recipient = {{ primary_mail_domain }}
+allow_domain_literals = false
+exim_user = exim
+exim_group = mail
+never_users = root
+rfc1413_query_timeout = 0s
+ignore_bounce_errors_after = 45m
+timeout_frozen_after = 1d
+freeze_tell = hostmaster@{{ primary_mail_domain }}
+helo_accept_junk_hosts = localhost:127.0.0.0/8
+auto_thaw = 1h
+smtp_banner = "$primary_hostname, ESMTP EXIM $version_number"
+smtp_accept_max = 5000
+smtp_accept_max_per_connection = 1000
+smtp_connect_backlog = 30
+smtp_accept_max_per_host = 300
+#smtp_accept_queue = 22
+smtp_accept_queue_per_connection = 100
+split_spool_directory = true
+remote_max_parallel = 20
+return_size_limit = 70k
+message_size_limit = 80M
+helo_allow_chars = _
+smtp_enforce_sync = true
+auth_advertise_hosts = *
+
+DKIM_DOMAIN                     = ${lc:${domain:$h_from:}}
+DKIM_FILE                       = /etc/exim/DKIM/${lc:${domain:$h_from:}}.key
+DKIM_PRIVATE_KEY                = ${if exists{DKIM_FILE}{DKIM_FILE}{0}}
+
+tls_certificate = /etc/ssl/{{ primary_mail_domain }}.crt
+tls_privatekey = /etc/ssl/{{ primary_mail_domain }}.key
+
+
+tls_advertise_hosts = *
+tls_verify_certificates = *
+daemon_smtp_ports = 25 : 465
+tls_on_connect_ports = 465
+
+log_selector =\
+    +all_parents \
+    +connection_reject \
+    +incoming_interface \
+    +lost_incoming_connection \
+    +received_sender \
+    +received_recipients \
+    +smtp_confirmation \
+    +smtp_syntax_error \
+    +smtp_protocol_error \
+    -queue_run
+
+syslog_timestamp = yes
+system_filter = /etc/exim/backup_copy.conf
+system_filter_directory_transport = local_copy_outgoin

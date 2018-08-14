@@ -1,0 +1,14 @@
+- name: Install pkg dependency
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - ntpdate
+    - ntp
+    - krb5-user 
+    - samba 
+    - winbind
+    - libpam-krb5
+    - libpam-winbind
+    - libnss-winbind
+  tags: Install pkg dependency

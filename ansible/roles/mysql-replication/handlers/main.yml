@@ -1,0 +1,6 @@
+---
+- name: restart mysqld daemon
+  service:
+    name=mysqld
+    state=restarted
+

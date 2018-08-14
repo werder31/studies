@@ -1,0 +1,6 @@
+---
+- name: restart dovecot daemon
+  service:
+    name: dovecot
+    state: restarted
+

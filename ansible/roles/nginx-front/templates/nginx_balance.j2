@@ -1,0 +1,31 @@
+upstream backend {
+{% if 'prod' in inventory_hostname %}
+{% for host  in groups['apacheprod'] %}
+        server {{ host }}:443;
+{% endfor %}
+
+{% else %}
+
+{% for host  in groups['apachetest'] %}
+        server {{ host }}:443;
+{% endfor %}
+{% endif %}
+}
+
+    server {
+        listen  80;
+	server_name {{ item }};
+    location / {
+        proxy_pass https://backend;
+        proxy_ssl_verify       off;
+
+        proxy_set_header Host {{ item }};
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+                }
+
+    }
+
+
+

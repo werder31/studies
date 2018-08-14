@@ -1,0 +1,20 @@
+---
+- name: Create Doc_root for domain
+  file:
+    dest: "/var/www/{{ item }}/"
+    state: directory
+    mode: 0755
+  with_items: "{{ web_domain }}"
+  when: web_domain is defined
+  tags: Configure VirtualHost
+
+- name: Create VirtualHost
+  template:
+    src: "VirtualHost.conf.j2"
+    dest: "/etc/httpd/conf.d/{{ item }}.conf"
+    owner: apache
+    group: apache
+    mode: 0644
+  with_items: "{{ web_domain }}"
+  when: web_domain is defined
+  tags: Configure VirtualHost

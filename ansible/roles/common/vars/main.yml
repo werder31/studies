@@ -1,0 +1,11 @@
+---
+basic_utils:
+ - mc
+ - wget
+ - nano
+ - bind-utils
+ - telnet
+ - unzip
+ - open-vm-tools
+ - glibc.i686
+ - libstdc++.i686

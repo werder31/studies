@@ -1,0 +1,52 @@
+---
+- name: Create exim conf files
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/exim/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  with_items:
+    - exim.conf
+    - 100.main.conf
+    - 400.acl-check-rcpt.conf
+    - 500.acl-check-mime.conf
+    - 510.acl-check-data.conf
+    - 600.routers.conf
+    - 700.transports.conf
+    - 800.retry.conf
+    - 850.rewrite.conf
+    - 900.authenticators.conf
+    - backup_copy.conf
+  tags: Exim configuration
+
+- name: Create graylisting conf file
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/exim/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  with_items:
+    - 110.greylist.conf
+    - 200.acl-greylist.conf
+  tags: Exim configuration
+
+- name: Create ACL lists
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/exim/acllist/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - falk_recipient
+    - relay_from_hosts
+    - spamersdomain
+    - spamersip
+    - whitelist_domain
+    - whitelist_sender
+  tags: Exim configuration
+  

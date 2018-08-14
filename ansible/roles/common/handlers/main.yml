@@ -1,0 +1,43 @@
+---
+- name: server reboot
+  command: /sbin/shutdown -r +0
+  async: 0
+  poll: 0
+  ignore_errors: true
+  tags: reboot
+  notify: Waiting for server to come after reboot
+
+- name: Waiting for server to come after reboot
+  local_action:
+    wait_for host={{ ansible_ssh_host }}
+    state=started
+    port=22
+    delay=30
+    timeout=300
+    connect_timeout=15
+  tags: reboot
+
+- name: Build RAR
+  command: /tmp/build_rar.sh
+  tags: basic-tasks
+
+###################################################################################################
+- name: Generate SSL
+  command: openssl genrsa -out "/etc/ssl/{{ primary_mail_domain }}.key" 2048
+  ignore_errors: yes
+  tags: Create SSL for Server
+  notify: Generate CSR
+
+- name: Generate CSR
+  command: openssl req -new -sha256 -subj '/CN={{ primary_mail_domain }}' -key "/etc/ssl/{{ primary_mail_domain }}.key" -out "/etc/ssl/{{ primary_mail_domain }}.csr"
+  ignore_errors: yes
+  notify: Generate Self-signed Certificate
+  tags: Create SSL for Server
+
+- name: Generate Self-signed Certificate
+  command: openssl req -x509 -days 1825 -key "/etc/ssl/{{ primary_mail_domain }}.key" -in "/etc/ssl/{{ primary_mail_domain }}.csr" -out "/etc/ssl/{{ primary_mail_domain }}.crt"
+  ignore_errors: yes
+  tags: Create SSL for Server
+###################################################################################################
+
+

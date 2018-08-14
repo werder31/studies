@@ -1,0 +1,17 @@
+---
+- name: Install dovecot server
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - dovecot
+    - dovecot-mysql
+  tags: Install and Configure dovecot
+
+- name: Enable and start dovecot server
+  service:
+    name: dovecot
+    state: started
+    enabled: yes
+  tags: Install and Configure dovecot
+

@@ -1,0 +1,17 @@
+- name: Create DB
+  mysql_db:
+    name: "{{ exim_db }}"
+    state: present
+  notify: 
+    - Import exim database structure
+  when: exim_db is defined
+  tags: Conf db for exim
+
+- name: Create mysql users
+  mysql_user:
+    name: "{{ exim_user }}"
+    host: "{{ exim_host }}"
+    password: "{{ exim_password }}"
+    priv: "{{ exim_priv }}"
+  when: exim_user is defined
+  tags: Conf db for exim

@@ -1,0 +1,31 @@
+#!/bin/sh
+.include /etc/exim/100.main.conf
+
+.include /etc/exim/110.greylist.conf
+
+begin acl
+#Greylisting
+.include /etc/exim/200.acl-greylist.conf
+
+acl_check_rcpt:
+.include /etc/exim/400.acl-check-rcpt.conf
+
+acl_check_mime:
+.include /etc/exim/500.acl-check-mime.conf
+
+acl_check_data:
+.include /etc/exim/510.acl-check-data.conf
+
+begin routers
+.include /etc/exim/600.routers.conf
+
+begin transports
+.include /etc/exim/700.transports.conf
+
+begin retry
+.include /etc/exim/800.retry.conf
+
+begin rewrite
+.include /etc/exim/850.rewrite.conf
+begin authenticators
+.include /etc/exim/900.authenticators.conf

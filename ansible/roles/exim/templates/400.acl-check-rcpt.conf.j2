@@ -1,0 +1,122 @@
+  accept  hosts = :
+
+#deny message = $sender_host_address is not allowed to send mail from $sender_address_domain
+#     spf = fail
+
+deny    message	= rejected because $sender_host_address is in a black list at $dnslist_domain\n$dnslist_text
+        !hosts = +whitelist_sender : 192.168.0.0/16 : 10.0.0.0/24
+        !authenticated = *
+        log_message = Host found in $dnslist_domain blacklist
+        dnslists = bl.spamcop.net : cbl.abuseat.org : pbl.spamhaus.org : b.barracudacentral.org : dnsbl.sorbs.net : zen.spamhaus.org
+
+defer   hosts = !+whitelist_sender : !+relay_from_hosts
+	!authenticated = *
+	!senders = +whitelist_domain
+	acl = greylist_acl
+	message = "greylisted - try again later. Read please  http://en.wikipedia.org/wiki/Greylisting"
+
+deny    message = You can not send mail on behalf of another user
+        senders = *@+local_domains
+        !hosts = localhost : 127.0.0.1 : +relay_from_hosts
+        condition = ${if eqi{$sender_address}{$authenticated_id}{no}{yes}}
+
+deny	message = "User rate overlimit - $sender_rate / $sender_rate_period"
+	authenticated = *
+	ratelimit = 500 / 1d / strict / $authenticated_id
+
+deny    message = "Host rate overlimit - $sender_rate / $sender_rate_period"
+	ratelimit = 500 / 1d / strict
+	hosts = *
+	log_message = Host rate overlimit - $sender_rate / $sender_rate_period
+
+deny    message = "You look like a bad spamer. We refuse to accept emails from you"
+	!authenticated = *
+        !hosts = localhost : 127.0.0.1 : +relay_from_hosts
+	senders = *@{{ primary_mail_domain }}{% for domain in secondary_mail_domain %} : *@{{ domain.name }}{% endfor %}
+
+        recipients = *@{{ primary_mail_domain }}{% for domain in secondary_mail_domain %} : *@{{ domain.name }}{% endfor %}
+
+
+deny    message = Your ip address is in the blacklist
+        hosts = +bad_senders
+
+deny	message = Deny send message to user from domain drfalkpharma.kiev.ua
+	recipients = +falk_recipient
+
+deny    message = Your Email address is in the blacklist
+        senders = +senderbadlist
+
+deny    message = "Invalid characters in the address"
+        domains = +local_domains
+        local_parts = ^[.] : ^.*[@%!/|]
+              
+deny    message = "Invalid characters in the address"
+        domains = !+local_domains
+        local_parts = ^[./|] : ^.*[@%!] : ^.*/\\.\\./
+  
+accept  authenticated = *
+        control = submission/sender_retain
+
+accept  local_parts = postmaster : root : admin
+        domains = +local_domains
+
+require verify = sender
+
+deny    message = "HELO / EHLO required by SMTP RFC be"
+        condition = ${if eq{$sender_helo_name}{}{yes}{no}}
+
+deny    message = "No need to push its own IP as the HELO!"
+        !hosts =  +relay_from_hosts
+        condition = ${if eq{$sender_helo_name}\
+                    {$sender_host_address}{true}{false}}
+              
+deny    condition = ${if eq{$sender_helo_name}{$interface_address}{yes}{no}}
+        hosts = !127.0.0.1 : !localhost : *
+        message = "This is my IP-address! Go away!"
+      
+deny    condition = ${if match{$sender_helo_name}{\N^\d+$\N}{yes}{no}}
+        hosts = !127.0.0.1:!localhost:*
+        message = "In the HELO can be only numbers!"
+
+deny    condition = ${if match{$sender_address}{\N^\s+$\N}{yes}{no}}
+        hosts = * : !localhost : !127.0.0.1 : !+relay_from_hosts
+        message = "Where sender of this mail?!"
+
+#---------------------------------------------------------------------
+deny    condition = ${if match{$sender_host_name}{\N^[a-z\-\.]*[0-9]{3, }.*?(\.cable|\.\w?dsl|\.\w?dsl-dhcp|\.(dialup|dial-up)[0-9\-\.]*|\.dyn[0-9\-\.]*|\
+                    \.(dial\dial-access|pool)[0-9\-\.]*|\.ppp[0-9\-\.]*|\.slip[0-9\-\.]*)\..*$\N}{1}{0}}
+        log_message = Blocked by ACL (cable/dsl/modem) (1)
+        message = No cable/dsl/modem users, use your ISP smtp server instead\n\
+                  Please contact postmaster\@ with any questions
+#---------------------------------------------------------------------
+deny    condition = ${if match{$sender_host_name}{\N^[0-9\-\.]{3, }[a-z\-\.].*?(\.cable|\.w?dsl|\.\w?dsl-dhcp|\.(dialup|dial-up)[0-9\-\.]*|\.dyn[0-9\-\.]*|\
+                    \.(dial\dial-access)[0-9\-\.]*|\.ppp[0-9\-\.]*|\.slip[0-9\-\.]*)\..*$\N}{1}{0}}
+        log_message = Blocked by ACL (cable/dsl/modem) (2)
+        message = No cable/dsl/modem users, use your ISP smtp server instead\n\
+                  Please contact postmaster\@ with any questions
+
+deny    condition = ${if match{$sender_host_name}{\N^[0-9a-z\-]{3, }(\.[a-z]{2,4})?\.client\d*\.attbi\.com$\N}{1}{0}}
+        log_message = Blocked by ACL (AT&T xDSL client)
+        message = No cable/dsl/modem users, use your ISP smtp server instead\n\
+                  Please contact postmaster\@ with any questions
+
+warn
+        set acl_m0 = 20s
+warn
+        hosts = +relay_from_hosts : +whitelist_sender
+        set acl_m0 = 0s
+warn
+        logwrite = Delay $acl_m0 for $sender_host_name [$sender_host_address] with HELO=$sender_helo_name. Mail from $sender_address to $local_part@$domain.
+        delay = $acl_m0
+
+accept  domains = +local_domains
+        endpass
+        message = "In this domain there is no such user"
+        verify = recipient
+
+accept  domains = +relay_to_domains
+        endpass
+        message = "My server does not know the route to this host"
+        verify = recipient
+
+deny    message = This is not OpenReley...

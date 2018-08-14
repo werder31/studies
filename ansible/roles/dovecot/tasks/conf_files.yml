@@ -1,0 +1,61 @@
+---
+- name: Configure dovecot from templates
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/dovecot/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: "u+rw,g+r,o+r"
+    force: yes
+  with_items:
+    - 10-mail.conf
+    - 10-ssl.conf
+  tags: Install and Configure dovecot
+  notify:
+    - restart dovecot daemon
+  ignore_errors: yes
+
+- name: Configure dovecot from templates
+  template:
+    src: "dovecot-mysql.conf.j2"
+    dest: "/etc/dovecot/dovecot-mysql.conf"
+    owner: root
+    group: root
+    mode: "u+rw,g+r,o+r"
+    force: yes
+  tags: Install and Configure dovecot
+  notify:
+    - restart dovecot daemon
+  ignore_errors: yes
+
+- name: Configure static dovecot conf files
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/dovecot/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: "u+rw,g+r,o+r"
+    force: yes
+  with_items:
+    - 10-auth.conf
+    - 10-logging.conf
+    - 10-master.conf
+    - 20-imap.conf
+    - 20-pop3.conf
+  tags: Install and Configure dovecot
+  notify:
+    - restart dovecot daemon
+  ignore_errors: yes
+
+- name: Create main dovecot conf file
+  copy:
+    src: "dovecot.conf"
+    dest: "/etc/dovecot/dovecot.conf"
+    owner: root
+    group: root
+    mode: "u+rw,g+r,o+r"
+    force: yes
+  tags: Install and Configure dovecot
+  notify:
+    - restart dovecot daemon
+  ignore_errors: yes

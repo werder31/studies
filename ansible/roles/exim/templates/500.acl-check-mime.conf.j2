@@ -1,0 +1,45 @@
+warn    decode = default
+
+deny    message = Blacklisted file extension detected
+        condition = ${if match \
+                    {${lc:$mime_filename}} \
+                    {\N(\.scr|\.vbs|\.bat|\.lnk|\.pif|\.cmd|\.com|\.js|\.reg|\.chm|\.cnf|\.hta|\.ins|\.scf|\.sct|\.vbe|\.wsc|\.wsf|\.wsh|\.xnk|\.mad|\.maf|\.mag|\.mam|\.maq|\.mar|\.mas|\.mat|\.mav|\.maw|\.bak|\.cab)$\N}{1}{0}}
+
+deny    message = A *.ZIP attachment CAN'T contains a Windows-executable file OR included arhive
+        log_message = forbidden attachment: filename=$mime_filename, content-type=$mime_content_type, recipients=$recipients
+        condition = ${if match{$mime_filename}{\N(?i)\.(rar$|zip$|arj$)\N}}
+        decode = default
+        condition = ${if match{${run{/usr/bin/unzip -l $mime_decoded_filename}}}{\N(?i)\.(tar|arj|rar|zip|exe|com|vbs|bat|pif|scr|hta|js|cmd|chm|cpl|jsp|reg|vbe|lnk|dll|sys|btm|dat|msi|prf|vb|bak|cab)\n\N}}
+
+deny    message = A .RAR attachment CAN'T contains a Windows-executable file OR Included arhive
+        log_message = forbidden attachment: filename=$mime_filename, content-type=$mime_content_type, recipients=$recipients
+        condition = ${if match{$mime_filename}{\N(?i)\.(rar$|zip$|arj$)\N}}
+        decode = default
+        condition = ${if match{${run{/usr/local/bin/unrar lb $mime_decoded_filename}}}{\N(?i)\.(tar|arj|rar|zip|exe|com|vbs|bat|pif|scr|hta|js|cmd|chm|cpl|jsp|reg|vbe|lnk|dll|sys|btm|dat|msi|prf|vb|bak|cab)\n\N}}
+
+deny    message = A .TAR attachment CAN'T contains a Windows-executable file OR Included arhive
+        log_message = forbidden attachment: filename=$mime_filename, content-type=$mime_content_type, recipients=$recipients
+        condition = ${if match{$mime_filename}{\N(?i)\.(rar$|zip$|arj$|tar$|tar.gz$|bz2$)\N}}
+        decode = default
+        condition = ${if match{${run{/bin/tar -ztvf $mime_decoded_filename}}}{\N(?i)\.(tar|arj|rar|zip|exe|com|vbs|bat|pif|scr|hta|js|cmd|chm|cpl|jsp|reg|vbe|lnk|dll|sys|btm|dat|msi|prf|vb|bak|cab)\n\N}}
+
+deny    message = A .TAR attachment CAN'T contains a Windows-executable file OR Included arhive
+        log_message = forbidden attachment: filename=$mime_filename, content-type=$mime_content_type, recipients=$recipients
+        condition = ${if match{$mime_filename}{\N(?i)\.(rar$|zip$|arj$|tar$|gz$|bz2$)\N}}
+        decode = default
+        condition = ${if match{${run{/bin/tar -tvf $mime_decoded_filename}}}{\N(?i)\.(tar|arj|rar|zip|exe|com|vbs|bat|pif|scr|hta|js|cmd|chm|cpl|jsp|reg|vbe|lnk|dll|sys|btm|dat|msi|prf|vb|bak|cab)\n\N}}
+
+deny    message = A .TAR attachment CAN'T contains a Windows-executable file OR Included arhive
+        log_message = forbidden attachment: filename=$mime_filename, content-type=$mime_content_type, recipients=$recipients
+        condition = ${if match{$mime_filename}{\N(?i)\.(rar$|zip$|arj$|tar$|gz$|bz2$)\N}}
+        decode = default
+        condition = ${if match{${run{/bin/tar -jtvf $mime_decoded_filename}}}{\N(?i)\.(tar|arj|rar|zip|exe|com|vbs|bat|pif|scr|hta|js|cmd|chm|cpl|jsp|reg|vbe|lnk|dll|sys|btm|dat|msi|prf|vb|bak|cab)\n\N}}
+
+deny    message = A .GZ attachment CAN'T contains a Windows-executable file OR Included arhive
+        log_message = forbidden attachment: filename=$mime_filename, content-type=$mime_content_type, recipients=$recipients
+        condition = ${if match{$mime_filename}{\N(?i)\.(rar$|zip$|arj$|tar$|gz$|bz2$)\N}}
+        decode = default
+        condition = ${if match{${run{/bin/gzip -l $mime_decoded_filename}}}{\N(?i)\.(tar|arj|rar|zip|exe|com|vbs|bat|pif|scr|hta|js|cmd|chm|cpl|jsp|reg|vbe|lnk|dll|sys|btm|dat|msi|prf|vb|bak|cab)\n\N}}
+
+accept
+

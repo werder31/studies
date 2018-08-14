@@ -1,0 +1,5 @@
+---
+- include: install.yml
+- include: folder_structure.yml
+- include: conf_files.yml
+- include: load_db.yml

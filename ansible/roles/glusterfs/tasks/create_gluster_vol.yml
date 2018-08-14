@@ -1,0 +1,19 @@
+- name: create gluster volume
+  gluster_volume:
+    state: present
+    name: "{{ volume_name }}"
+    bricks: "{{ mount_path }}/brick/{{ volume_name }}"
+#    rebalance: yes
+    replicas: 2
+    force: yes
+    cluster:
+     - "{{ hostvars[groups['storage-grp'][0]]['ansible_eth0']['ipv4']['address'] }}"
+     - "{{ hostvars[groups['storage-grp'][1]]['ansible_eth0']['ipv4']['address'] }}"
+  run_once: true
+  tags: gluster volume
+
+- name: start gluster volume
+  gluster_volume:
+    state: started
+    name: "{{ volume_name }}"
+  tags: gluster volume

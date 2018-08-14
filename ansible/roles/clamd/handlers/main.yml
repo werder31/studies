@@ -1,0 +1,21 @@
+---
+- name: Configure crontab for update clamd
+  lineinfile:
+    path: /etc/crontab
+    line: '30 2 * * * root /usr/bin/freshclam'
+  notify:
+    - Crontab Restart
+  tags: Antivirus configuration
+
+- name: Enable and start Clamd server
+  service:
+    name: clamd
+    state: started
+    enabled: yes
+  tags: install and start Clamd
+
+- name: Crontab Restart
+  service:
+    name: crond
+    state: restarted
+  tags: Antivirus configuration

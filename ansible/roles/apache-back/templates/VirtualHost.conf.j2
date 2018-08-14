@@ -1,0 +1,20 @@
+<VirtualHost *:443>
+	DocumentRoot /var/www/{{ item }}/
+	ServerName {{ item }}
+	ServerAlias www.{{ item }}
+	ServerAdmin webmaster@{{ item }}
+	ErrorLog /var/log/httpd/{{ item }}_errorlog
+        SSLEngine on
+        SSLProtocol All -SSLv2 -SSLv3
+        SSLHonorCipherOrder on
+        SSLCipherSuite !ADH:!EXPORT56:!RC4:HIGH::!aNULL:!MD5
+        SSLCertificateFile /var/www/ssl/{{ item }}.crt
+        SSLCertificateKeyFile /var/www/ssl/{{ item }}.key
+    <Directory /var/www/{{ item }}/>
+        Options +FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+	</Directory>
+</VirtualHost>
+

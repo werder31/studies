@@ -1,0 +1,91 @@
+---
+- name: Create .ssh dir on remote servers
+  file:
+    path: "~/.ssh/"
+    state: directory
+    mode: 0700
+  tags: basic-tasks
+
+- name: Copy id_rsa.pub to remote servers
+  copy:
+    src: "~/.ssh/id_rsa.pub"
+    dest: "~/.ssh/authorized_keys"
+    owner: root
+    group: root
+    mode: 0600
+  tags: basic-tasks
+
+- name: Change Hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - "192.168.0.10  dc1 dc1.domain.local domain.local"
+    - "192.168.0.11  dc2 dc2.domain.local domain.local"
+
+- name: Delete resolv.conf file
+  file:
+    state: absent
+    path: "/etc/resolv.conf"
+  tags: Create resolv.conf file
+  run_once: true
+
+- name: Copy new files
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  with_items:
+    - resolv.conf
+    - ntp.conf
+    - krb5.conf
+  tags: Copy new files
+
+- name: Copy new samba conf file
+  copy:
+    src: "smb.conf"
+    dest: "/etc/samba/smb.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  tags: Copy new files
+
+- name: Configure Nsswitch
+  replace:
+    path: /etc/nsswitch.conf
+    regexp: 'compat?$'
+    replace: 'compat winbind'
+  tags: Start start
+
+- name: Sync time
+  command: /usr/sbin/ntpdate -u dc1.domain.local
+  tags: Date configure
+
+- name: Stop Services
+  service:
+    name: "{{ item }}"
+    state: stopped
+  with_items:
+    - winbind
+    - smbd
+    - ntp
+  tags: Stop Services
+
+- name: Start Services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - winbind
+    - smbd
+    - ntp
+  tags: Start Services
+

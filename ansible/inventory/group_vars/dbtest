@@ -1,0 +1,23 @@
+mysql_databases:
+   - name: testdb
+     collation: utf8_general_ci
+     encoding: utf8
+     replicate: yes
+
+mysql_replication_user:
+   - name: replicauser
+     host: "%"
+     password: 3m0Mn5c9H8ZA36C
+     priv: "*.*:REPLICATION SLAVE,REPLICATION CLIENT"
+
+mysql_root_password:	password
+
+mysql_replication_master: test_db01
+
+mysql_max_binlog_size: "100M"
+mysql_binlog_format: "ROW"
+mysql_expire_logs_days: "10"
+
+mysql_port:		3306
+mysql_datadir:		/var/lib/mysql
+mysql_socket:		/var/lib/mysql/mysql.sock

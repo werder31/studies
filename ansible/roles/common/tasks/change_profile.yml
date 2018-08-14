@@ -1,0 +1,16 @@
+---
+- name: Add ENVIRONMENT NAME to PROD SERVERS
+  lineinfile:
+    path: /etc/profile
+#    insertafter: '# /etc/profile'
+    line: 'export ENVIRONMENT=PRODUCTION'
+  when: ('prod' in inventory_hostname)
+  tags: Set environment
+
+- name: Add ENVIRONMENT NAME to STAGING SERVERS
+  lineinfile:
+    path: /etc/profile
+    insertafter: '# /etc/profile'
+    line: 'export ENVIRONMENT=STAGING'
+  when: ('test' in inventory_hostname)
+  tags: Set environment

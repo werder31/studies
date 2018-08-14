@@ -1,0 +1,5 @@
+---
+- name: Add PC to AD
+  shell: /bin/echo 1WNmoHmvtDZ9p3N5hZMS | /usr/bin/net ads join -U adduserdomain -D DOMAIN.LOCAL
+  notify: server reboot
+  tags: add to domain

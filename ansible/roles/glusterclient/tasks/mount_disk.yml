@@ -1,0 +1,41 @@
+---
+- name: Create Brick directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "u+rwx,g+rwx,o+rwx"
+  with_items:
+    - "{{ mount_path }}"
+    - "{{ mount_path }}/brick"
+    - "{{ mount_path }}/brick/{{ volume_name }}"
+  tags: Check Disk
+
+- name: Parted Free Disk
+  parted:
+    device: /dev/{{ item.key }}
+    state: present
+    number: 1
+  with_dict: "{{ ansible_devices }}"
+  register: free_disk
+  tags: Check Disk
+  when: not item.value.partitions and item.key != "sr0" and item.key != "fd0" and item.key != "sda"
+  notify: Create a ext4 filesystem
+
+- name: Mount new disk
+  mount:
+    path: "{{ mount_path }}/brick"
+    src: "/dev/{{ item.item.key }}1"
+    fstype: ext4
+    opts: rw
+    state: present
+  with_items: "{{free_disk.results}}"
+  when: item.changed == true
+  tags: Check Disk
+  notify: mount new disk
+
+#- name: mount new disk
+#  command: /bin/mount "/dev/{{ item.item.key }}1" "{{ mount_path }}"
+#  with_items: "{{free_disk.results}}"
+#  when: item.changed == true

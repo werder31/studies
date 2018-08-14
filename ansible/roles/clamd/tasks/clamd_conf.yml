@@ -1,0 +1,54 @@
+---
+- name: Config file for Clamd
+  copy:
+    src: "clamd.conf"
+    dest: "/etc/clamd.conf"
+    owner: root
+    group: root
+    mode: 644
+    force: yes
+  notify:
+    - Configure crontab for update clamd
+  tags: Antivirus configuration
+
+- name: Change permission for Clamd pid file folder
+  file:
+    path: /var/run/clamav/
+    state: directory
+    owner: exim
+    group: clam
+    mode: "u+rw,g+rw"
+  tags: Antivirus configuration
+
+- name: Change permission for clamd log
+  file:
+    path: /var/log/clamav/clamd.log
+    state: touch
+    owner: exim
+    group: clam
+    mode: "u+rw,g+rw"
+  tags: Antivirus configuration
+
+- name: Add clam user to exim and mail group
+  user:
+    name: clam
+    state: present
+    groups: exim,mail
+  tags: Antivirus configuration
+
+- name: Add exim, mail user to clam group
+  user:
+    name: "{{ item }}"
+    state: present
+    group: "clam"
+  with_items:
+    - exim
+    - mail
+  tags: Antivirus configuration
+
+- name: Start and Enable Clamd
+  service:
+    name: clamd
+    state: started
+    enabled: yes
+  tags: Antivirus configuration

@@ -1,0 +1,9 @@
+- name: install Antivirus Clamd
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - clamd
+    - clamav-db
+    - clamav
+  tags: Antivirus configuration

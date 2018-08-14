@@ -1,0 +1,8 @@
+- name: Add Nginx repo
+  yum_repository:
+    name: nginx-repo
+    description: nginx repo
+    file: nginx_repo
+    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
+    enabled: yes
+    gpgcheck: no

@@ -1,0 +1,24 @@
+---
+- name: Create SSL directory
+  file:
+    path: "/var/www/ssl/"
+    state: directory
+    mode: 600
+  ignore_errors: yes
+  tags: Create SSL for Web
+
+- name: Check or exist ssl key for domain
+  stat:
+    path: "/var/www/ssl/{{ item }}.key"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  with_items: "{{ web_domain }}"
+  tags: Create SSL for Web
+  register: SSLKeyCheck
+  changed_when: not SSLKeyCheck.stat.exists
+  notify: Generate SSL
+
+
+

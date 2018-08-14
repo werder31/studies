@@ -1,0 +1,10 @@
+---
+- name: Create Balanced Virtual host
+  template:
+    src="nginx_balance.j2"
+    dest="/etc/nginx/conf.d/{{ item }}.conf"
+    owner=root
+    group=root
+    mode=0644
+  with_items: "{{ web_domain }}"
+  tags: nginxconf

@@ -1,0 +1,7 @@
+- hosts: mail-test
+  roles:
+  - common
+  - mysql
+  - exim
+  - clamd
+  - dovecot

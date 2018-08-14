@@ -1,0 +1,18 @@
+primary_mail_domain: domain.com
+secondary_mail_domain:
+    - name: test3.local
+    - name: test4.local
+exim_db: eximdb
+exim_user: eximuser
+exim_password: eximpassword
+exim_host: localhost
+exim_priv: "{{ exim_db }}.*:ALL"
+
+mail_path: /mail/
+mail_archive_path: /mailarchive/
+mysql_root_password:    "Iwi11NeV3RevEeU$3defaultPA$$WORDS"
+
+mysql_port:             3306
+mysql_datadir:          /var/lib/mysql
+mysql_socket:           /var/lib/mysql/mysql.sock
+
