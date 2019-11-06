@@ -1,3 +1,0 @@
-- hosts: storage-grp
-  roles:
-  - common
