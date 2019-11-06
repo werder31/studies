@@ -1,15 +1,13 @@
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-{% if 'prod' in inventory_hostname %}
-{{ prod_nginx }}        prod_nginx prod.local
-{{ prod_apache01 }}     prod_apache01
-{{ prod_apache02 }}     prod_apache02
-{{ prod_db01 }}         prod_db01
-{{ prod_db02 }}         prod_db02
-{% else %}
-{{ test_nginx }}        test_nginx test.local
-{{ test_apache01 }}     test_apache01
-{{ test_apache02 }}     test_apache02
-{{ test_db01 }}         test_db01
-{{ test_db02 }}         test_db02
-{% endif %}
+192.168.36.10 ansible.domain.local ansible
+192.168.36.11 master1.domain.local master1
+192.168.36.12 master2.domain.local master2
+192.168.36.13 master3.domain.local master3
+192.168.36.21 worker1.domain.local worker1
+192.168.36.22 worker2.domain.local worker2
+192.168.36.23 worker3.domain.local worker3
+192.168.36.31 stor1.domain.local stor1
+192.168.36.32 stor2.domain.local stor2
+192.168.36.33 stor3.domain.local stor3
+

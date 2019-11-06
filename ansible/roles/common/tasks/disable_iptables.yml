@@ -5,5 +5,4 @@
     state: stopped
     enabled: no
   with_items:
-    - iptables
-    - ip6tables
+    - firewalld

@@ -1,19 +1,42 @@
+---
+- name: Check if Gluster volumes already exist.
+  shell: "gluster volume info"
+  changed_when: false
+  register: gluster_volume_info
+  tags: Add gluster volume
+
+- name: Create Brick directory
+  file:
+    path: "{{ item.brick_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "u+rwx,g+rwx,o+rwx"
+  with_items: "{{ volumes }}"
+  tags: Add gluster volume     
+
+- name: Start glusterd on the nodes if not already started
+  service:
+       state: started
+       name: glusterd
+       enabled: yes
+  delegate_to: "{{ item }}"
+  run_once: true
+  with_items: "{{ groups.storagegrp }}"
+  tags: Add gluster volume     
+
 - name: create gluster volume
   gluster_volume:
-    state: present
-    name: "{{ volume_name }}"
-    bricks: "{{ mount_path }}/brick/{{ volume_name }}"
-#    rebalance: yes
-    replicas: 2
-    force: yes
-    cluster:
-     - "{{ hostvars[groups['storage-grp'][0]]['ansible_eth0']['ipv4']['address'] }}"
-     - "{{ hostvars[groups['storage-grp'][1]]['ansible_eth0']['ipv4']['address'] }}"
+    state: "{{ gluster_cluster_state | default('present') }}"
+    volume: "{{ item.name }}"
+    bricks: "{{ item.brick_path }}"
+    replicas: "{{ item.replicas | default(0) }}"
+    arbiters: "{{ item.arbiters | default(0)}}"
+    disperses: "{{ item.disperses | default(0) }}"
+    redundancies: "{{ item.redundancies | default(0) }}"
+    force: "{{ item.force | default('no') }}"
+    options: "{{ item.options | default({}) }}"
+    cluster: "{{ groups.storagegrp | join(',') }}"
   run_once: true
-  tags: gluster volume
-
-- name: start gluster volume
-  gluster_volume:
-    state: started
-    name: "{{ volume_name }}"
-  tags: gluster volume
+  with_items: "{{ volumes }}"
+  tags: Add gluster volume

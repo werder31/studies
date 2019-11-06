@@ -1,0 +1,17 @@
+---
+- name: install ca package on rhel systems
+  yum:
+    name: ca-certificates
+    state: present
+
+- name: copy certificate authority to trusted ca path of the os
+  copy:
+    src: '{{ item }}'
+    dest: '{{ ca_path }}/'
+    owner: root
+    group: root
+    mode: 0644
+  with_fileglob:
+  - files/*
+  notify:
+  - update trusted ca

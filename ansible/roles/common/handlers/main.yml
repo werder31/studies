@@ -17,27 +17,5 @@
     connect_timeout=15
   tags: reboot
 
-- name: Build RAR
-  command: /tmp/build_rar.sh
-  tags: basic-tasks
-
-###################################################################################################
-- name: Generate SSL
-  command: openssl genrsa -out "/etc/ssl/{{ primary_mail_domain }}.key" 2048
-  ignore_errors: yes
-  tags: Create SSL for Server
-  notify: Generate CSR
-
-- name: Generate CSR
-  command: openssl req -new -sha256 -subj '/CN={{ primary_mail_domain }}' -key "/etc/ssl/{{ primary_mail_domain }}.key" -out "/etc/ssl/{{ primary_mail_domain }}.csr"
-  ignore_errors: yes
-  notify: Generate Self-signed Certificate
-  tags: Create SSL for Server
-
-- name: Generate Self-signed Certificate
-  command: openssl req -x509 -days 1825 -key "/etc/ssl/{{ primary_mail_domain }}.key" -in "/etc/ssl/{{ primary_mail_domain }}.csr" -out "/etc/ssl/{{ primary_mail_domain }}.crt"
-  ignore_errors: yes
-  tags: Create SSL for Server
-###################################################################################################
-
-
+- name: update trusted ca
+  shell: /bin/update-ca-trust

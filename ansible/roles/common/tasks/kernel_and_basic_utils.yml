@@ -12,16 +12,6 @@
     state: latest
   tags: basic-tasks
 
-- name: Copy executable script for build RAR
-  copy:
-    src: build_rar.sh
-    dest: /tmp/build_rar.sh
-    owner: root
-    group: root
-    mode: "o+rw,g+x"
-  tags: basic-tasks
-  notify: Build RAR
-
 - name: Install basic utils
   yum:
     name: "{{ item }}"

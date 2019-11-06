@@ -1,3 +1,14 @@
 ---
-mount_path: /storage
-volume_name: test1
+basic_utils:
+ - mc
+ - wget
+ - nano
+ - bind-utils
+ - telnet
+ - unzip
+ - open-vm-tools
+ - glibc.i686
+ - libstdc++.i686
+ - net-tools
+
+ca_path: /etc/pki/ca-trust/source/anchors

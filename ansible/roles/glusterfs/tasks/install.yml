@@ -3,15 +3,19 @@
   yum_repository:
     name: Glusterfs
     description: CentOS-$releasever - Gluster 3.10
-    baseurl: http://mirror.centos.org/centos/$releasever/storage/$basearch/gluster-3.10
+    baseurl: http://mirror.centos.org/centos/$releasever/storage/$basearch/gluster-6
     enabled: yes
     gpgcheck: no
   tags: Install and start GlusterServer
 
 - name: Install GlusterFS Server
   yum:
-    name: glusterfs-server
+    name: "{{ item }}"
     state: latest
+  with_items:
+    - glusterfs-server 
+    - glusterfs-rdma
+    - glusterfs-coreutils
   tags: Install and start GlusterServer
 
 - name: Enables and start GlsuterFS daemon

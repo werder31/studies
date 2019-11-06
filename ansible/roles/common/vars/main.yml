@@ -9,3 +9,6 @@ basic_utils:
  - open-vm-tools
  - glibc.i686
  - libstdc++.i686
+ - net-tools
+
+ca_path: /etc/pki/ca-trust/source/anchors

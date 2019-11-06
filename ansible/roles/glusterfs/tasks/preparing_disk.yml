@@ -1,0 +1,33 @@
+---
+- name: Parted Free Disk
+  parted:
+    device: /dev/{{ item.disk_name }}
+    state: present
+    number: 1
+  with_items: "{{ storage_disk }}"
+  register: free_disk
+  tags: Check Disk11
+
+- name:  Create a ext4 filesystem
+  filesystem:
+    fstype: "{{ item.fstype }}"
+    dev: "/dev/{{ item.disk_name }}1"
+  with_items: "{{ storage_disk }}"
+  tags: Check Disk11
+
+- name: Create mount point in fstab
+  mount:
+    path: "/mnt"
+    src: "/dev/{{ item.disk_name }}1"
+    fstype: "{{ item.fstype }}"
+    opts: rw
+    state: present
+  with_items: "{{ storage_disk }}"   
+  tags: Check Disk11
+
+- name: mount new disk
+  command: /bin/mount "/dev/{{ item.disk_name }}1" {{ item.mount_point }}
+  with_items: "{{ storage_disk }}"
+  ignore_errors: yes
+  tags: Check Disk11
+

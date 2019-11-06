@@ -1,5 +1,4 @@
 ---
 - include: install.yml
-- include: mount_disk.yml
-- include: change_hosts.yml
+- include: preparing_disk.yml
 - include: create_gluster_vol.yml
