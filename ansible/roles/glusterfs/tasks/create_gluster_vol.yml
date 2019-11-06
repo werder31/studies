@@ -13,7 +13,7 @@
     group: root
     mode: "u+rwx,g+rwx,o+rwx"
   with_items: "{{ volumes }}"
-  tags: Add gluster volume     
+  tags: Add gluster volume
 
 - name: Start glusterd on the nodes if not already started
   service:
@@ -23,7 +23,7 @@
   delegate_to: "{{ item }}"
   run_once: true
   with_items: "{{ groups.storage_srv }}"
-  tags: Add gluster volume     
+  tags: Add gluster volume
 
 - name: create gluster volume
   gluster_volume:
@@ -37,6 +37,18 @@
     force: "{{ item.force | default('no') }}"
     options: "{{ item.options | default({}) }}"
     cluster: "{{ groups.storage_srv | join(',') }}"
+    directory: "{{ item.limit_path | default('/')}}"
+    quota: "{{ item.volume_limit | default('10GB') }}"
   run_once: true
+  with_items: "{{ volumes }}"
+  tags: Add gluster volume
+
+- name: Create Brick directory
+  file:
+    path: "{{ item.brick_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "u+rwx,g+rwx,o+rwx"
   with_items: "{{ volumes }}"
   tags: Add gluster volume

@@ -1,21 +1,40 @@
 - hosts: storage_srv
   roles:
-  - glusterfs
-     storage_VIP_ip: 192.168.36.7
-     storage_disk:
-     - disk_name: sdb
-       mount_point: /mnt
-       fstype: xfs
-     volumes:
-     - name: docker-registry
-       gluster_cluster_state: present
-       brick_path: /mnt/brick1/docker-registry
-       replicas: 3
-       options: { performance.cache-size: 128MB, write-behind: 'off', quick-read: 'on', network.ping-timeout: '1', nfs.disable: 'off' }
-     volumes:
-     - name: test
-       gluster_cluster_state: present
-       brick_path: /mnt/brick1/test
-       replicas: 3
-       options: { performance.cache-size: 128MB, write-behind: 'off', quick-read: 'on', network.ping-timeout: '1', nfs.disable: 'off' }
+  - role: keepalived
+    storage_VIP_ip: 192.168.36.7
+    global_defs:
+      notification_email:
+      - email1@example.com
+      notification_email_from: 'keepalived@example.com'
+    vrrp_instances:
+      - name: 'VI_01'
+        state: 'MASTER'
+        interface: 'ens32'
+        virtual_router_id: 10
+        priority: 100
+        smtp_alert: True
+        authentication:
+          auth_type: 'PASS'
+          auth_pass: 'secpass'
+        virtual_ipaddress:
+        - '{{ storage_VIP_ip }}/24 dev ens32 label ens32:1'
+
+  - role: glusterfs
+    storage_disk:
+    - disk_name: sdb
+      mount_point: /mnt
+      fstype: xfs
+    volumes:
+    - name: docker-registry
+      gluster_cluster_state: present
+      brick_path: /mnt/brick1/docker-registry
+      replicas: 3
+      options: { performance.cache-size: 128MB, write-behind: 'off', quick-read: 'on', network.ping-timeout: '1', nfs.disable: 'off' }
+      volume_limit: 50.0GB
+      limit_path: /
+    - name: test
+      gluster_cluster_state: present
+      brick_path: /mnt/brick1/test
+      replicas: 3
+      options: { performance.cache-size: 128MB, write-behind: 'off', quick-read: 'on', network.ping-timeout: '1', nfs.disable: 'off' }
   serial: "100%"
