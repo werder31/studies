@@ -1,0 +1,12 @@
+- hosts: storage_client
+  roles:
+  - glusterclient
+      storage_VIP_ip: 192.168.36.7
+      volumes:
+      - name: docker-registry
+        dst_point: /mnt
+        mount_type: glusterfs
+      - name: test
+        dst_point: /mnt
+        mount_type: glusterfs
+  serial: "100%"

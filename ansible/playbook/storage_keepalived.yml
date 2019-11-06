@@ -1,0 +1,20 @@
+    - hosts: keepalived
+      roles:
+        - role: keepalived
+          global_defs:
+            notification_email:
+              - email1@example.com
+            notification_email_from: 'keepalived@example.com'
+          vrrp_instances:
+            - name: 'VI_01'
+              state: 'MASTER'
+              interface: 'ens32'
+              virtual_router_id: 10
+              priority: 100
+              smtp_alert: True
+              authentication:
+                auth_type: 'PASS'
+                auth_pass: 'secpass'
+              virtual_ipaddress:
+                - '{{ storage_VIP_ip }}/24 dev ens32 label ens32:1'
+

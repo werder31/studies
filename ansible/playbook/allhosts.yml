@@ -1,0 +1,4 @@
+- hosts: allhosts
+  roles:
+  - common
+  serial: "100%"

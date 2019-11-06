@@ -1,0 +1,12 @@
+---
+# This role installs and sets up keepalived
+
+- name: Install keepalived (Centos)
+  yum: name=keepalived state=present
+  tags: keepalived
+  notify: restart keepalived
+
+- name: Configure keepalived
+  template: src=keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf
+  tags: keepalived
+  notify: restart keepalived

@@ -1,0 +1,21 @@
+- hosts: storage_srv
+  roles:
+  - glusterfs
+     storage_VIP_ip: 192.168.36.7
+     storage_disk:
+     - disk_name: sdb
+       mount_point: /mnt
+       fstype: xfs
+     volumes:
+     - name: docker-registry
+       gluster_cluster_state: present
+       brick_path: /mnt/brick1/docker-registry
+       replicas: 3
+       options: { performance.cache-size: 128MB, write-behind: 'off', quick-read: 'on', network.ping-timeout: '1', nfs.disable: 'off' }
+     volumes:
+     - name: test
+       gluster_cluster_state: present
+       brick_path: /mnt/brick1/test
+       replicas: 3
+       options: { performance.cache-size: 128MB, write-behind: 'off', quick-read: 'on', network.ping-timeout: '1', nfs.disable: 'off' }
+  serial: "100%"

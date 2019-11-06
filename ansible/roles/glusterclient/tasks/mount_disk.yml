@@ -3,8 +3,8 @@
 - name: Ensure the Gluster volume is mounted.
   mount:
     name: "{{ item.dst_point }}/{{ item.name }}"
-    src: "{{ item.server }}:/{{ item.name }}"
-    fstype: glusterfs
+    src: "{{ storage_VIP_ip }}:/{{ item.name }}"
+    fstype: "{{ item.mount_type }}"
     opts: "defaults,_netdev"
     state: mounted
   with_items: "{{ volumes }}"

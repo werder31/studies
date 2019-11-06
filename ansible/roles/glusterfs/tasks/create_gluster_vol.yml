@@ -22,7 +22,7 @@
        enabled: yes
   delegate_to: "{{ item }}"
   run_once: true
-  with_items: "{{ groups.storagegrp }}"
+  with_items: "{{ groups.storage_srv }}"
   tags: Add gluster volume     
 
 - name: create gluster volume
@@ -36,7 +36,7 @@
     redundancies: "{{ item.redundancies | default(0) }}"
     force: "{{ item.force | default('no') }}"
     options: "{{ item.options | default({}) }}"
-    cluster: "{{ groups.storagegrp | join(',') }}"
+    cluster: "{{ groups.storage_srv | join(',') }}"
   run_once: true
   with_items: "{{ volumes }}"
   tags: Add gluster volume
