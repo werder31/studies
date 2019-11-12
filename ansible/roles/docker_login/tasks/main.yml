@@ -1,0 +1,11 @@
+---
+- name: Log into private registry and force re-authorization
+  docker_login:
+    registry: ansible.domain.local:5000
+    username: superpuper
+    registry_url: https://ansible.domain.local/v2/
+    password: superpuper
+    tls: yes
+    tls_hostname: ansible.domain.local
+  tags: Log into private registry
+

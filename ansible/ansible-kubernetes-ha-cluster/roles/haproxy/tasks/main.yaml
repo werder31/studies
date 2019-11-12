@@ -1,0 +1,69 @@
+- name: create /opt/ha_config directory
+  file: 
+    path: /opt/hap_config  
+    state: directory 
+    mode: 0644
+
+- name: generate and copy HAproxy config
+  template: 
+    src: haproxyConfig.j2 
+    dest: /opt/hap_config/haproxy.cfg
+  register: hapConfig
+
+- name: Creates registry cert directory
+  file:
+    path: "/etc/docker/certs.d/'{{ docker_registry }}'"
+    mode: 0775
+    recurse: yes
+  tags: test1111
+
+- name: Copy file with owner and permission, using symbolic representation
+  copy:
+    src: /etc/pki/tls/registry.crt
+    dest: "/etc/docker/certs.d/'{{ docker_registry }}'/"
+    mode: u=rw,g=r,o=r
+  tags: test1111
+
+- name: Log into private registry and force re-authorization
+  docker_login:
+    registry: '{{ docker_registry }}'
+    username: superpuper
+    registry_url: "https://'{{ docker_registry }}'/v2/"
+    password: superpuper
+    tls: yes
+    tls_hostname: ansible.domain.local
+  tags: Log into private registry
+
+- name: pull an image haproxy:1.5
+  shell: docker pull haproxy:1.5
+  tags: docker image
+
+- name: Tag and push to local registry
+  shell: "docker tag docker.io/haproxy:1.5 '{{ docker_registry }}'/haproxy:1.5"
+  tags: docker image
+
+- name: Tag and push to docker_registry
+  shell: "docker push '{{ docker_registry }}'/haproxy:1.5"
+  tags: docker image
+
+- name: "Pulling image {{ haproxy_container_image }}"
+  shell: docker pull "{{ haproxy_container_image }}"
+
+- name: run haproxy in a container
+  docker_container:
+   name: haproxy
+   image: "{{haproxy_container_image}}"
+   restart_policy: always
+   state: started
+   privileged: yes
+   network_mode: host
+   exposed_ports:
+    - "{{ha_proxy_port}}"
+    - "{{etcd_proxy_port}}"
+   volumes:
+    - /opt/hap_config/:/usr/local/etc/haproxy/
+   command: -f /usr/local/etc/haproxy/haproxy.cfg
+
+- name: restart haproxy container if it is started
+  shell: docker restart haproxy
+  when: hapConfig.changed

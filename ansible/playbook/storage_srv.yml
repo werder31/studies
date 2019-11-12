@@ -20,6 +20,7 @@
         - '{{ storage_VIP_ip }}/24 dev ens32 label ens32:1'
 
   - role: glusterfs
+    storage_VIP_ip: 192.168.36.7
     storage_disk:
     - disk_name: sdb
       mount_point: /mnt

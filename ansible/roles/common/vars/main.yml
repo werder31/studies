@@ -10,5 +10,6 @@ basic_utils:
  - glibc.i686
  - libstdc++.i686
  - net-tools
+ - epel-release
 
 ca_path: /etc/pki/ca-trust/source/anchors

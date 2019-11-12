@@ -8,3 +8,4 @@
     opts: "defaults,_netdev"
     state: mounted
   with_items: "{{ volumes }}"
+  tags: mount

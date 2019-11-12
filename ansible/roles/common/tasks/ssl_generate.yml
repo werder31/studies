@@ -1,0 +1,21 @@
+- name: Create SSL directory
+  file:
+    path: "/etc/ssl/"
+    state: directory
+    mode: 644
+  ignore_errors: yes
+  tags: Create SSL for Server
+  when: primary_mail_domain is defined
+
+- name: Check or exist ssl key for domain
+  stat:
+    path: "/etc/ssl/{{ primary_mail_domain }}.key"
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  tags: Create SSL for Server
+  register: SSLKeyCheck
+  changed_when: not SSLKeyCheck.stat.exists
+  when: primary_mail_domain is defined
+  notify: Generate SSL
